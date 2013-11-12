@@ -1,10 +1,22 @@
-{% if userlist %}
-	<ul>
-	{% for myuser in userlist %}
-		<li><a href="{% url 'task:user detail' myuser.id %}">{{ myuser.user.first_name }} {{ myuser.user.last_name }}</a>: {{ myuser.cash }}</li>
-	{% endfor %}
-	</ul>
+<!DOCTYPE HTML>
+<Html>
+<Head>
+	<title>Index</title>
+</Head>
 
-{% else %}
-	<p>No users are avaiable.</p>
-{% endif %}
+<Body>
+
+	{% if myuser_list %}
+		<ul>
+		{% for myuser in myuser_list %}
+		<li><a href="{% url 'task:user detail' myuser.id %}">{{ myuser.user.first_name }} {{ myuser.user.last_name }}</a>: {{ myuser.cash }}</li>
+		{% endfor %}
+		</ul>
+
+	{% else %}
+		<p>No users are avaiable.</p>
+	{% endif %}
+
+</Body>
+
+</Html>
