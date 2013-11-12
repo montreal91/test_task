@@ -1,0 +1,10 @@
+{% if orders %}
+	<ul>
+	{% for o in orders %}
+		<li><a href="{% url 'task:order detail' o.id %}">{{ o.title }}</a>: {{ o.price }}</li>
+	{% endfor %}
+	</ul>
+
+{% else %}
+	<p>No orders are avaiable.</p>
+{% endif %}

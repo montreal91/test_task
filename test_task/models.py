@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-class MyUser(models.Model): #, models.Model):
+class MyUser(models.Model): 
 	"""Data class which describes users"""
 	user = models.OneToOneField(User)
 	cash = models.DecimalField(default=0.00, max_digits=20, decimal_places=2)
@@ -11,15 +11,15 @@ class MyUser(models.Model): #, models.Model):
 	completed = models.PositiveIntegerField(default=0)
 
 	def __unicode__(self):
-		return self.username
+		return self.user.username
 
 
 class Order(models.Model):
 	"""Data class which describes orders"""
 	title = models.CharField(max_length=200)
 	price = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
-	customer = models.ForeignKey(MyUser, related_name='+')
-	performer = models.ForeignKey(MyUser, related_name='+')
+	customer = models.ForeignKey(MyUser, related_name='+', null=True)
+	performer = models.ForeignKey(MyUser, related_name='+', null=True)
 	pub_date = models.DateTimeField('date published')
 	description = models.TextField(blank=True)
 
