@@ -9,7 +9,7 @@
 	{% if myuser_list %}
 		<ul>
 		{% for myuser in myuser_list %}
-		<li><a href="{% url 'task:user detail' myuser.id %}">{{ myuser.user.first_name }} {{ myuser.user.last_name }}</a>: {{ myuser.cash }}</li>
+		<li><a href="{% url 'task:user detail' myuser.id %}">{{ myuser.user.first_name }} ({{ myuser.user.username }}) {{ myuser.user.last_name }}</a>: {{ myuser.cash }}</li>
 		{% endfor %}
 		</ul>
 

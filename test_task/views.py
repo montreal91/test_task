@@ -18,11 +18,6 @@ class UserIndexView(generic.ListView):
 	def get_queryset(self):
 		return MyUser.objects.order_by('-cash')
 
-def orders_index(request):
-	orders = Order.objects.order_by('-price')
-	context = {'orders': orders}
-	return render(request, 'test_task/order_index.html', context)
-
 class OrderIndexView(generic.ListView):
 	template_name = 'test_task/order_index.html'
 	context_object_name = 'orders'
@@ -30,11 +25,16 @@ class OrderIndexView(generic.ListView):
 	def get_queryset(self):
 		return Order.objects.order_by('-price')
 
-def user_detail(request, user_id):
-	my_user = get_object_or_404(MyUser, pk=user_id)
-	if my_user:
-		logger.info("everything is fine")
-	return render(request, 'test_task/user.html', {'user': my_user})
+class UserDetailView(generic.DetailView):
+	model = MyUser
+	template_name = 'test_task/user.html'
+
+#not very sure about this
+#my view should be able to recognize logged in users
+#to let them to perform the order
+class OrderDetailView(generic.DetailView):
+	model = Order
+	template_name = 'test_task/order.html'
 
 def order_detail(request, order_id):
 	order = get_object_or_404(Order, pk=order_id)

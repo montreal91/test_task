@@ -22,6 +22,7 @@ class Order(models.Model):
 	performer = models.ForeignKey(MyUser, related_name='+', null=True)
 	pub_date = models.DateTimeField('date published')
 	description = models.TextField(blank=True)
+	active = models.BooleanField(default=True)
 
 	def __unicode__(self):
 		return self.title
