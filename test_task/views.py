@@ -23,7 +23,7 @@ class OrderIndexView(generic.ListView):
 	context_object_name = 'orders'
 
 	def get_queryset(self):
-		return Order.objects.order_by('-price')
+		return Order.objects.filter(active=True)
 
 class UserDetailView(generic.DetailView):
 	model = MyUser
@@ -36,14 +36,15 @@ class OrderDetailView(generic.DetailView):
 	model = Order
 	template_name = 'test_task/order.html'
 
-def order_detail(request, order_id):
-	order = get_object_or_404(Order, pk=order_id)
-	return render(request, 'test_task/order.html', {'order': order})
+#Google-App-Engine style view
+#class SignUpView(generic.View):
+#	def get(self, request):
+#		return render(request, 'test_task/sign_up.html')
 
-#This should be a class-based view
-#This should be a sign-up view
-def signup(request):
-	if request.method == "GET":
-		return HttpResponse("Get")
-	if request.method == "POST":
-		return HttpResponse("Post")
+#	def post(self, request):
+#		return HttpResponse(request.POST['username'])
+
+#It seems to me that that kind of magic doesn't work this time
+class CreateMyUser(generic.edit.CreateView):
+	model = MyUser
+	fields = ['user', 'cash']

@@ -13,6 +13,9 @@ class MyUser(models.Model):
 	def __unicode__(self):
 		return self.user.username
 
+	def get_absolute_url(self):
+		return reverse('user detail', kwargs={'pk': self.pk})
+
 
 class Order(models.Model):
 	"""Data class which describes orders"""
