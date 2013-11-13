@@ -1,10 +1,12 @@
 import logging
+import utils
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views import generic
 
+from django.contrib.auth.models import User
 from test_task.models import MyUser, Order
 
 #This logger is writing something somewhere but I can't read it in the terminal
@@ -38,14 +40,56 @@ class OrderDetailView(generic.DetailView):
 	template_name = 'test_task/order.html'
 
 #Google-App-Engine style view
+#This looks ugly
 class SignUpView(generic.View):
 	def get(self, request):
-		return render(request, 'test_task/sign_up.html')
+		return render(request, 'test_task/myuser_form.html')
 
 	def post(self, request):
-		return HttpResponse(request.POST['username'])
+		username = request.POST['username']
+		password = request.POST['password']
+		verify = request.POST['verify']
+		email = request.POST['email']
+		f_name = request.POST['first_name']
+		l_name = request.POST['last_name']
 
-#It seems to me that that kind of magic doesn't work this time
-#class CreateMyUser(generic.edit.CreateView):
-#	model = MyUser
-#	fields = ['user', 'cash']
+		any_error = False
+		error_username, error_password, error_verify, error_email = '', '', '', ''
+
+		if not utils.valid_username(username):
+			error_username = "That's not a valid username."
+			any_error = True
+
+		if not utils.valid_password(password):
+			error_password = "That's not a valid password."
+			any_error = True
+
+		if password != verify:
+			error_verify = "Your passwords didn't match."
+			any_error = True
+
+		if not utils.valid_email(email):
+			error_email = "That's not a valid e-mail."
+			any_error = True
+
+		if any_error:
+			context = {
+				'username': username,
+				'email': email,
+				'first_name': f_name,
+				'last_name': l_name,
+				'error_username': error_username,
+				'error_verify': error_verify,
+				'error_password': error_password,
+				'error_email': error_email
+			}
+			return render(request, 'test_task/myuser_form.html', context)
+
+		else:
+			u = User.objects.create_user(username, email, password)
+			u.first_name = f_name
+			u.last_name = last_name
+			u.save()
+			m = MyUser(user=u, cash=cash)
+			m.save()
+			return HttpResponse(m.pk)
