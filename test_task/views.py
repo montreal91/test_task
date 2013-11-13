@@ -16,6 +16,7 @@ class UserIndexView(generic.ListView):
 	context_object_name = 'myuser_list'
 
 	def get_queryset(self):
+		"""Allows to show in the index page only active orders"""
 		return MyUser.objects.order_by('-cash')
 
 class OrderIndexView(generic.ListView):
@@ -37,14 +38,14 @@ class OrderDetailView(generic.DetailView):
 	template_name = 'test_task/order.html'
 
 #Google-App-Engine style view
-#class SignUpView(generic.View):
-#	def get(self, request):
-#		return render(request, 'test_task/sign_up.html')
+class SignUpView(generic.View):
+	def get(self, request):
+		return render(request, 'test_task/sign_up.html')
 
-#	def post(self, request):
-#		return HttpResponse(request.POST['username'])
+	def post(self, request):
+		return HttpResponse(request.POST['username'])
 
 #It seems to me that that kind of magic doesn't work this time
-class CreateMyUser(generic.edit.CreateView):
-	model = MyUser
-	fields = ['user', 'cash']
+#class CreateMyUser(generic.edit.CreateView):
+#	model = MyUser
+#	fields = ['user', 'cash']
