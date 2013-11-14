@@ -5,8 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.views import generic
-
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+
 from test_task.models import MyUser, Order
 
 class UserIndexView(generic.ListView):
@@ -86,8 +87,10 @@ class SignUpView(generic.View):
 			new_user.first_name = f_name
 			new_user.last_name = l_name
 			new_user.save()
-			new_myuser = MyUser(user=u, cash=cash)
+			new_myuser = MyUser(user=new_user, cash=cash)
 			new_myuser.save()
-			response = HttpResponseRedirect('/users/%s' % m.pk)
-			response.set_cookie('cookies', '%s' % m.pk)
-			return response
+			login(request, new_user)
+			return HttpResponseRedirect('/')
+
+class LogInView(generic.View):
+	pass
