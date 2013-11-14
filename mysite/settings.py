@@ -39,6 +39,8 @@ INSTALLED_APPS = (
     'test_task',
 )
 
+AUTH_USER_MODEL = 'test_task.MyUser'
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

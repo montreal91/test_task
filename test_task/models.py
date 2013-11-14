@@ -1,17 +1,16 @@
 import datetime
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
-class MyUser(models.Model): 
+class MyUser(AbstractUser): 
 	"""Data class which describes users"""
-	user = models.OneToOneField(User)
 	cash = models.DecimalField(default=0.00, max_digits=20, decimal_places=2)
 	ordered = models.PositiveIntegerField(default=0)
 	completed = models.PositiveIntegerField(default=0)
 
 	def __unicode__(self):
-		return self.user.username
+		return self.username
 
 	def get_absolute_url(self):
 		return reverse('user detail', kwargs={'pk': self.pk})
