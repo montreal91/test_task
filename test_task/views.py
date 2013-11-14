@@ -58,7 +58,6 @@ class SignUpView(FormView):
 class LogInView(FormView):
 	template_name = 'test_task/login.html'
 	form_class = LoginForm
-#	success_url = '/'
 
 	def form_valid(self, form):
 		username = form.cleaned_data['username']
@@ -69,19 +68,20 @@ class LogInView(FormView):
 			login(self.request, user)
 			return HttpResponseRedirect('/')
 
-#@login_required
 class CreateOrderView(FormView):
 	template_name = 'test_task/create_order.html'
 	form_class = OrderForm
-#	success_url = '/'
 	
-	@method_decorator(login_required)
+#	@method_decorator(login_required)
 	def form_valid(self, form):
 		title = form.cleaned_data['title']
 		price = form.cleaned_data['price']
 		description = form.cleaned_data['description']
 		pub_date = timezone.now()
 		customer = self.request.user
+
+		order = Order(title=title, price=price, description=description, pub_date=pub_date, customer=customer)
+		order.save()
 
 		return HttpResponseRedirect('/')
 
