@@ -52,6 +52,7 @@ class SignUpView(generic.View):
 		email = request.POST['email']
 		f_name = request.POST['first_name']
 		l_name = request.POST['last_name']
+		cash = float(request.POST['cash'])
 
 		any_error = False
 		error_username, error_password, error_verify, error_email = '', '', '', ''
@@ -88,8 +89,10 @@ class SignUpView(generic.View):
 		else:
 			u = User.objects.create_user(username, email, password)
 			u.first_name = f_name
-			u.last_name = last_name
+			u.last_name = l_name
 			u.save()
 			m = MyUser(user=u, cash=cash)
 			m.save()
-			return HttpResponse(m.pk)
+			response = HttpResponseRedirect('/users/%s' % m.pk)
+			response.set_cookie('cookies', '%s' % m.pk)
+			return response
