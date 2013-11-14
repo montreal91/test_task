@@ -1,5 +1,3 @@
-import utils
-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -73,3 +71,10 @@ class LogInView(generic.edit.FormView):
 def logout_view(request):
 	logout(request)
 	return HttpResponseRedirect('/')
+
+def la_view(request):
+#	return HttpResponse(request.user.is_authenticated())
+	if request.user.is_authenticated():
+		return HttpResponse(request.user.username)
+	else:
+		return HttpResponse('Anonimous')
