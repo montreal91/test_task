@@ -17,8 +17,13 @@ class MyUserForm(forms.Form):
 	email = forms.EmailField()
 	first_name = forms.CharField(max_length=20)
 	last_name = forms.CharField(max_length=20)
-	cash = forms.DecimalField()
+	cash = forms.DecimalField(max_digits=20, decimal_places=2)
 
 class LoginForm(forms.Form):
 	username = forms.CharField(max_length=20)
 	password = forms.CharField(max_length=30)
+
+class OrderForm(forms.Form):
+	title = forms.CharField(max_length=200)
+	price = forms.DecimalField(max_digits=10, decimal_places=2)
+	description = forms.CharField(widget=forms.Textarea)

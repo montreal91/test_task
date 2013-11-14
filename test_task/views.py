@@ -1,14 +1,15 @@
-from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.db import IntegrityError
-from django.views import generic
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import FormView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.utils.decorators import method_decorator
 
 from test_task.models import MyUser, Order
-from test_task.forms import MyUserForm, LoginForm
+from test_task.forms import MyUserForm, LoginForm, OrderForm
 
-class UserIndexView(generic.ListView):
+class UserIndexView(ListView):
 	template_name = 'test_task/user_index.html'
 	context_object_name = 'myuser_list'
 
@@ -16,25 +17,25 @@ class UserIndexView(generic.ListView):
 		"""Allows to show in the index page only active orders"""
 		return MyUser.objects.order_by('-cash')
 
-class OrderIndexView(generic.ListView):
+class OrderIndexView(ListView):
 	template_name = 'test_task/order_index.html'
 	context_object_name = 'orders'
 
 	def get_queryset(self):
 		return Order.objects.filter(active=True)
 
-class UserDetailView(generic.DetailView):
+class UserDetailView(DetailView):
 	model = MyUser
 	template_name = 'test_task/user.html'
 
 #not very sure about this
 #my view should be able to recognize logged in users
 #to let them to perform the order
-class OrderDetailView(generic.DetailView):
+class OrderDetailView(DetailView):
 	model = Order
 	template_name = 'test_task/order.html'
 
-class SignUpView(generic.edit.FormView):
+class SignUpView(FormView):
 	template_name = 'test_task/create_user.html'
 	form_class = MyUserForm
 	success_url = '/'
@@ -54,10 +55,10 @@ class SignUpView(generic.edit.FormView):
 		return HttpResponseRedirect('/login/')
 
 
-class LogInView(generic.edit.FormView):
+class LogInView(FormView):
 	template_name = 'test_task/login.html'
 	form_class = LoginForm
-	success_url = '/'
+#	success_url = '/'
 
 	def form_valid(self, form):
 		username = form.cleaned_data['username']
@@ -68,12 +69,27 @@ class LogInView(generic.edit.FormView):
 			login(self.request, user)
 			return HttpResponseRedirect('/')
 
+#@login_required
+class CreateOrderView(FormView):
+	template_name = 'test_task/create_order.html'
+	form_class = OrderForm
+#	success_url = '/'
+	
+	@method_decorator(login_required)
+	def form_valid(self, form):
+		title = form.cleaned_data['title']
+		price = form.cleaned_data['price']
+		description = form.cleaned_data['description']
+		pub_date = timezone.now()
+		customer = self.request.user
+
+		return HttpResponseRedirect('/')
+
 def logout_view(request):
 	logout(request)
 	return HttpResponseRedirect('/')
 
 def la_view(request):
-#	return HttpResponse(request.user.is_authenticated())
 	if request.user.is_authenticated():
 		return HttpResponse(request.user.username)
 	else:
