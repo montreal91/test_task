@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.views import generic
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 from test_task.models import MyUser, Order
@@ -93,4 +93,22 @@ class SignUpView(generic.View):
 			return HttpResponseRedirect('/')
 
 class LogInView(generic.View):
-	pass
+	def get(self, request):
+		return render(request, 'test_task/login.html')
+
+	def post(self, request):
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
+
+		if user is not None:
+			login(request, user)
+			return HttpResponseRedirect('/')
+
+		else:
+			context = {'username': username, 'password': password, 'error': 'Wrong password or username.'}
+			return render(request, 'test_task/login.html', context)
+
+def logout_view(request):
+	logout(request)
+	return HttpResponseRedirect('/')
