@@ -8,7 +8,7 @@ from django.views import generic
 from django.contrib.auth import authenticate, login, logout
 
 from test_task.models import MyUser, Order
-from test_task.forms import MyUserForm
+from test_task.forms import MyUserForm, LoginForm
 
 class UserIndexView(generic.ListView):
 	template_name = 'test_task/user_index.html'
@@ -49,32 +49,26 @@ class SignUpView(generic.edit.FormView):
 		last_name = form.cleaned_data['last_name']
 		cash = form.cleaned_data['cash']
 
-		add = {'first_name': first_name, 'last_name': last_name, 'cash': cash}
-
 		new = MyUser.objects.create_user(username, email, password, 
 			first_name=first_name, last_name=last_name, cash=cash)
-		authenticate(username=username, password=password)
-		login(self.request, new)
 
-		return HttpResponseRedirect('/')
+		#bad style
+		return HttpResponseRedirect('/login/')
 
 
-class LogInView(generic.View):
-	def get(self, request):
-		return render(request, 'test_task/login.html')
+class LogInView(generic.edit.FormView):
+	template_name = 'test_task/login.html'
+	form_class = LoginForm
+	success_url = '/'
 
-	def post(self, request):
-		username = request.POST['username']
-		password = request.POST['password']
+	def form_valid(self, form):
+		username = form.cleaned_data['username']
+		password = form.cleaned_data['password']
 		user = authenticate(username=username, password=password)
 
-		if user is not None:
-			login(request, user)
+		if user is not None and user.is_active:
+			login(self.request, user)
 			return HttpResponseRedirect('/')
-
-		else:
-			context = {'username': username, 'password': password, 'error': 'Wrong password or username.'}
-			return render(request, 'test_task/login.html', context)
 
 def logout_view(request):
 	logout(request)
