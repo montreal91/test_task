@@ -6,9 +6,9 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.views import generic
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 
 from test_task.models import MyUser, Order
+from test_task.forms import MyUserForm
 
 class UserIndexView(generic.ListView):
 	template_name = 'test_task/user_index.html'
@@ -36,61 +36,28 @@ class OrderDetailView(generic.DetailView):
 	model = Order
 	template_name = 'test_task/order.html'
 
-#This looks ugly
-class SignUpView(generic.View):
-	def get(self, request):
-		return render(request, 'test_task/myuser_form.html')
+class SignUpView(generic.edit.FormView):
+	template_name = 'test_task/create_user.html'
+	form_class = MyUserForm
+	success_url = '/'
 
-	def post(self, request):
-		username = request.POST['username']
-		password = request.POST['password']
-		verify = request.POST['verify']
-		email = request.POST['email']
-		f_name = request.POST['first_name']
-		l_name = request.POST['last_name']
-		
-		try:
-			cash = float(request.POST['cash'])
-		except ValueError:
-			cash = 0.0
+	def form_valid(self, form):
+		username = form.cleaned_data['username']
+		password = form.cleaned_data['password']
+		email = form.cleaned_data['email']
+		first_name = form.cleaned_data['first_name']
+		last_name = form.cleaned_data['last_name']
+		cash = form.cleaned_data['cash']
 
-		any_error = False
-		context = {'username': username, 'email': email, 'first_name': f_name, 'last_name': l_name, 
-			'cash': cash}
+		add = {'first_name': first_name, 'last_name': last_name, 'cash': cash}
 
-		if not utils.valid_username(username):
-			context['error_username'] = "That's not a valid username."
-			any_error = True
+		new = MyUser.objects.create_user(username, email, password, 
+			first_name=first_name, last_name=last_name, cash=cash)
+		authenticate(username=username, password=password)
+		login(self.request, new)
 
-		if not utils.valid_password(password):
-			context['error_password'] = "That's not a valid password."
-			any_error = True
+		return HttpResponseRedirect('/')
 
-		if password != verify:
-			context['error_verify'] = "Your passwords didn't match."
-			any_error = True
-
-		if not utils.valid_email(email):
-			context['error_email'] = "That's not a valid e-mail."
-			any_error = True
-
-		if any_error:
-			return render(request, 'test_task/myuser_form.html', context)
-
-		else:
-			try:
-				new_user = User.objects.create_user(username, email, password)
-			except IntegrityError:
-				context['error_username'] = "Such user is already exists."
-				return render(request, 'test_task/myuser_form.html', context)
-
-			new_user.first_name = f_name
-			new_user.last_name = l_name
-			new_user.save()
-			new_myuser = MyUser(user=new_user, cash=cash)
-			new_myuser.save()
-			login(request, new_user)
-			return HttpResponseRedirect('/')
 
 class LogInView(generic.View):
 	def get(self, request):
