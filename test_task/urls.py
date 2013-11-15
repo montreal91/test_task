@@ -11,5 +11,4 @@ urlpatterns = patterns('',
 	url(r'logout/', views.logout_view, name='log_out'),
 	url(r'users/', views.UserIndexView.as_view(), name='users index'),
 	url(r'createorder/', views.CreateOrderView.as_view(), name='create_order'),
-	url(r'lala/', views.la_view),
 )

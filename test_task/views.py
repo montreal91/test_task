@@ -2,12 +2,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 
 from test_task.models import MyUser, Order
-from test_task.forms import MyUserForm, LoginForm, OrderForm
+from test_task.forms import MyUserForm, OrderForm
 
 class UserIndexView(ListView):
 	template_name = 'test_task/user_index.html'
@@ -57,8 +56,8 @@ class SignUpView(FormView):
 
 class LogInView(FormView):
 	template_name = 'test_task/login.html'
-	form_class = LoginForm
-
+	form_class = AuthenticationForm
+	
 	def form_valid(self, form):
 		username = form.cleaned_data['username']
 		password = form.cleaned_data['password']
@@ -72,7 +71,6 @@ class CreateOrderView(FormView):
 	template_name = 'test_task/create_order.html'
 	form_class = OrderForm
 	
-#	@method_decorator(login_required)
 	def form_valid(self, form):
 		title = form.cleaned_data['title']
 		price = form.cleaned_data['price']
@@ -88,9 +86,3 @@ class CreateOrderView(FormView):
 def logout_view(request):
 	logout(request)
 	return HttpResponseRedirect('/')
-
-def la_view(request):
-	if request.user.is_authenticated():
-		return HttpResponse(request.user.username)
-	else:
-		return HttpResponse('Anonimous')
