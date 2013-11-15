@@ -9,3 +9,10 @@
 
 <br><br>
 {{ order.pub_date }}
+
+{% if user.is_authenticated %}
+	{{ user.username }}
+	<form method="post"> {% csrf_token %}
+		<input type="submit" value="perform">
+	</form>
+{% endif %}

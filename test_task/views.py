@@ -1,3 +1,5 @@
+import decimal
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
@@ -37,14 +39,32 @@ class UserDetailView(DetailView):
 #not very sure about this
 #my view should be able to recognize logged in users
 #to let them to perform the order
-class OrderDetailView(DetailView):
+class OrderDetailView(DetailView):#, FormView):
 	model = Order
 	template_name = 'test_task/order.html'
+
+	def post(self, request, pk):
+		performer = self.request.user
+		order = Order.objects.get(pk=pk)
+
+		val = order.price * decimal.Decimal(0.95)
+
+		performer.cash = performer.cash + val
+		performer.completed += 1
+		performer.save()
+
+		order.performer = performer
+		order.active = False
+		order.save()
+
+		ta = TransAction(user=performer, action="Performed order \'%s\'" % order.title, value=val)
+		ta.save() 
+
+		return HttpResponseRedirect('/')
 
 class SignUpView(FormView):
 	template_name = 'test_task/create_user.html'
 	form_class = MyUserForm
-	success_url = '/'
 
 	def form_valid(self, form):
 		username = form.cleaned_data['username']
@@ -87,6 +107,10 @@ class CreateOrderView(FormView):
 		customer.ordered += 1
 		customer.cash -= price
 		customer.save()
+
+		sys = MyUser.objects.get(pk=1)
+		sys.cash += price * 0.05
+		sys.save()
 
 		transaction = TransAction(user=customer, action="Made order %s" % title, value=price)
 		transaction.save()
