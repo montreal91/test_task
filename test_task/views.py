@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 
-from test_task.models import MyUser, Order
+from test_task.models import MyUser, Order, TransAction
 from test_task.forms import MyUserForm, OrderForm
 
 class UserIndexView(ListView):
@@ -22,6 +22,13 @@ class OrderIndexView(ListView):
 
 	def get_queryset(self):
 		return Order.objects.filter(active=True)
+
+class TransactionListView(ListView):
+	template_name = 'test_task/transactions_list.html'
+	context_object_name = 'transactions'
+
+	def get_queryset(self):
+		return TransAction.objects.filter(user=self.request.user)
 
 class UserDetailView(DetailView):
 	model = MyUser
@@ -77,6 +84,12 @@ class CreateOrderView(FormView):
 		description = form.cleaned_data['description']
 		pub_date = timezone.now()
 		customer = self.request.user
+		customer.ordered += 1
+		customer.cash -= price
+		customer.save()
+
+		transaction = TransAction(user=customer, action="Made order %s" % title, value=price)
+		transaction.save()
 
 		order = Order(title=title, price=price, description=description, pub_date=pub_date, customer=customer)
 		order.save()

@@ -1,0 +1,16 @@
+{% if user.is_authenticated %}
+	<table>
+		<tr>
+			<td>Action</td>
+			<td>Value</td>
+		</tr>
+		{% for ta in transactions %}
+		<tr>
+			<td>{{ ta.action }}</td>
+			<td>{{ ta.value }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% else %}
+	To see your transactiona you should be logged in.
+{% endif %}

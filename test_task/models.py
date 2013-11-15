@@ -28,3 +28,13 @@ class Order(models.Model):
 
 	def __unicode__(self):
 		return self.title
+
+
+class TransAction(models.Model):
+	"""Data class which describes transactions"""
+	user = models.ForeignKey(MyUser, related_name='+', null=True)
+	action = models.CharField(max_length=50)
+	value = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
+
+	def __unicode__(self):
+		return self.user.username + ' ' + self.action
