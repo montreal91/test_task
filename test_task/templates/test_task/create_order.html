@@ -1,6 +1,13 @@
+{% if user.is_authenticated %}
 <form action='/createorder/' method='post'> {% csrf_token %}
 	<table>
 		{{ form.as_table }}
 	</table>
 	<input type='submit' value='Submit'>
 </form>
+	{{ user.username }}
+
+{% else %}
+	Only registered users can make orders.
+
+{% endif %}
